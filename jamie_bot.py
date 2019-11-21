@@ -9,8 +9,9 @@ import requests
 #Int to limit the amount of comments the bot will search through at a time
 #commentLimit = 25
 #To stream comments from the subreddit constantly use this: .stream.comments()
-#The string that the bot will look for (what the Reddit user will type)
-botString = "!pullthatupjamie"
+
+botString = "!pullthatupjamie"	#The string that the bot will look for (what the Reddit user will type)
+subreddit = "test"	# What subreddit the bot is active in. Multiple subreddits is not supported
 
 
 #Logs the JamieJREBot account into Reddit from config file
@@ -25,13 +26,13 @@ def bot_login():
 
 #The work of the bot, meaning writing the comment and doing the comment handling
 def run_bot(handle, comments_replied_to):
-    print "Obtaining comments..."
-    for comment in handle.subreddit('test').stream.comments():
+    print("Obtaining comments...")
+    for comment in handle.subreddit(subreddit).stream.comments():
         if botString in comment.body.lower() and comment.id not in comments_replied_to and comment.author != handle.user.me():
             #Adds the comment ID to a txt file so it won't repeat comments
             comments_replied_to.append(comment.id)
-            print "String with \"" + botString + "\" found! in comment " + comment.id
-            print "Replied to comment " + comment.id
+            print("String with \"" + botString + "\" found! in comment " + comment.id)
+            print("Replied to comment " + comment.id)
 
             #Writes to the file
             with open ("comments_replied_to.txt", "a") as f:
@@ -52,14 +53,12 @@ def run_bot(handle, comments_replied_to):
                             "[" + results[0][2] + "](" + results[1][2] + ") | " + results[2][2] + "\n\n"
                             + "I am a bot.")
                 except:
-                    comment.reply("Either there were no results or your search wasn't in quotations! /n/n"
-                        + "I am a bot.")
+                    comment.reply("Either there were no results or your search wasn't in quotations! Please follow the correct"
+				  "formatting rules and try again/n/n I am a bot.")
 
-
-
-
+		
+#Checks if there is a .txt named "comments_replied_to.txt". If it doesn't exist, it creates it.
 def get_saved_comments():
-    #Checks if there is a .txt named "comments_replied_to.txt". If it doesn't exist, it creates it.
     if not os.path.isfile("comments_replied_to.txt"):
         comments_replied_to = []
     else:
@@ -70,6 +69,7 @@ def get_saved_comments():
     return comments_replied_to
 
 
+# Will perform a YouTube search from user's string and store the necessary data from the search into a list
 def search_yt(comment):
     link = []
     title = []
@@ -97,6 +97,7 @@ def search_yt(comment):
     return yt_results
 
 
+# Translates the user's search request into the proper HTML format for search
 def create_search(comment):
     comment_body = list(comment.body.split('\"',1)[1].split('\"')[0])
     x = 0
@@ -111,6 +112,7 @@ def create_search(comment):
     comment_body = ''.join(comment_body)
     return comment_body
 
+
 def check_search(comment):
     comment_body=list(comment.body)
     x = 0
@@ -119,7 +121,8 @@ def check_search(comment):
             x += 1
     if x<2:
         raise Exception
-    
+
+	
 def fix_result(comment):
     comment_body = list(comment)
     x = 0
@@ -131,9 +134,8 @@ def fix_result(comment):
     return comment_body
 
     
-handle = bot_login()
-comments_replied_to = get_saved_comments()
-
-
+handle = bot_login()	# Logging the bot in
+comments_replied_to = get_saved_comments()	# Getting the comments we've already replied to
+# Executing the bot
 while True:
     run_bot(handle, comments_replied_to)
