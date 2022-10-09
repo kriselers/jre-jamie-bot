@@ -1,4 +1,4 @@
-# JamieJREBot
+# Joe Rogan Experience - Jamie Bot
 Code for the JamieJREBot on Reddit
 
 A reddit bot that will stream the comments from a given subreddit and look for the string "!pullthatupjamie" and peform
